@@ -8,7 +8,20 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from django.contrib import messages
 from PIL import Image
-from django.views.generic import ListView
+from django.views.generic import UpdateView, CreateView, ListView
+from django.forms import ModelForm
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
+from crispy_forms.bootstrap import FormActions
+
+
+
+
+
+
+
+#########################################################################
+#stud_list
 class StudentList(ListView):
   model = Student
   context_object_name = 'students'
@@ -28,166 +41,80 @@ class StudentList(ListView):
     # order by last name
     return qs.order_by('last_name')
 
-def stud_add(request):
-  # was form posted?
-  if request.method == "POST":
-    # was form add button clicked?
-    if request.POST.get('add_button') is not None:
-      # errors collection
-      errors = {}
-      # data for student object
-      data = {'middle_name': request.POST.get('middle_name'),'notes': request.POST.get('notes')}
-      # validate user input
-      first_name = request.POST.get('first_name', '').strip()
-      if not first_name:
-        errors['first_name'] = u"Ім'я є обов'язковим"
-      else:
-        data['first_name'] = first_name
-      last_name = request.POST.get('last_name', '').strip()
-      if not last_name:
-        errors['last_name'] = u"Прізвище є обов'язковим"
-      else:
-        data['last_name'] = last_name
-      birthday = request.POST.get('birthday', '').strip()
-      if not birthday:
-        errors['birthday'] = u"Дата народження є обов'язковою"
-      else:
-        try:
-          datetime.strptime(birthday, '%Y-%m-%d')
-        except Exception:
-          errors['birthday'] = u"Введіть коректний формат дати (напр. 1986-03-23)"
-        else:
-          data['birthday'] = birthday
-      ticket = request.POST.get('ticket', '').strip()
-      if not ticket:
-        errors['ticket'] = u"Номер білета є обов'язковим"
-      else:
-        data['ticket'] = ticket
-      student_group_id = request.POST.get('student_group_id', '').strip()
-      if not student_group_id:
-        errors['student_group_id'] = u"Оберіть групу для студента"
-      else:
-        groups = Group.objects.filter(pk=student_group_id)
-        if len(groups) != 1:
-          errors['student_group'] = u"Оберіть коректну групу"
-        else:
-          data['student_group_id'] = groups[0]
-      photo = request.FILES.get('photo')
-      if photo:
-        if photo.name.split(".")[-1].lower() not in ('jpg', 'jpeg', 'png', 'gif'):
-           errors['photo'] = u"Файл має бути одного з наступних типів: jpg, jpeg, png, gif"
-        else:
-           try:
-             Image.open(photo)
-           except Exception:
-             errors['photo'] = u"Завантажений файл не є файлом зображення або пошкоджений"
-           else:
-             if photo.size > 2 * 1024 * 1024:
-                errors['photo'] = u"Фото занадто велике (розмір файлу має бути менше 2Мб)"
-             else:
-                data['photo'] = photo
-           
-      # save student
-      if not errors:
-        student = Student(**data)
-        student.save()
-        # redirect to students list
-        return HttpResponseRedirect( u'%s?status_message=Студента успішно додано!'  % reverse('main'))
-      else:
-        # render form with errors and previous user input
-        return render(request, 'students/students_add.html',
-        {'groups': Group.objects.all().order_by('title'),'errors': errors})
-    elif request.POST.get('cancel_button') is not None:
-      # redirect to home page on cancel button
-      return HttpResponseRedirect( u'%s?status_message=Додавання студента скасовано!' % reverse('main'))
-  else:
-   # initial form render
-   return render(request, 'students/students_add.html',
-   {'groups': Group.objects.all().order_by('title')})
 
 
 
-def student_edit(request, pk):
-    students = Student.objects.filter(pk=pk)
-    groups = Group.objects.all()
 
-    
-    if request.method == "POST":
-        data = Student.objects.get(pk=pk)
-        if request.POST.get('add_button') is not None:
-            data.middle_name = request.POST.get('middle_name', '').strip()
-            data.notes = request.POST.get('notes', '').strip()
-            errors = {}
 
-            first_name = request.POST.get('first_name', '').strip()
-            if not first_name:
-                errors['first_name'] = u"Імʼя є обовʼязковим."
-            else:
-                data.first_name = first_name
 
-            last_name = request.POST.get('last_name', '').strip()
-            if not last_name:
-                errors['last_name'] = u"Прізвище є обовʼязковим."
-            else:
-                data.last_name = last_name
 
-            birthday = request.POST.get('birthday', '').strip()
-            if not birthday:
-                errors['birthday'] = u"Дата народження є обовʼязковою."
-            else:
-                try:
-                    bd = datetime.strptime(birthday, '%Y-%m-%d')
-                except Exception:
-                    errors['birthday'] = u"Введіть коректний формат дати (напр. 1987-12-30)"
-                else:
-                    data.birthday = bd
-           
-            photo = request.FILES.get('photo')
-            if photo:
-             if len(photo) > (10 * 1024):
-               errors['photo'] = u"Файл завеликий"
-             else:
-               data.photo = photo
 
-            ticket = request.POST.get('ticket', '').strip()
-            if not ticket:
-                errors['ticket'] = u"Номер білета є обовʼязковим."
-            else:
-                data.ticket = ticket
 
-            student_group_id = request.POST.get('student_group_id', '').strip()
-            if not student_group_id:
-                errors['student_group_id'] = u"Група є обовʼязковою"
-            else:
-                gr = Group.objects.filter(pk=student_group_id)
-                if len(gr) != 1:
-                    errors['student_group_id'] = u"Оберіть коректну групу"
-                else:
-                    grps = Group.objects.filter(leader=Student.objects.get(pk=pk))
-                    if len(grps) > 0 and int(student_group_id) != grps[0].pk:
-                        errors['student_group'] = u"Студент є старостою іншої групи"
-                    else:
-                        data.student_group_id = gr[0]
+##########################################################################
 
-            if errors:
-                return render(request, 'students/students_edit.html', {'pk': pk, 'student': data, 'errors': errors, 'groups': groups})
-            else:
-                data.save()
-                return HttpResponseRedirect( reverse('main'))
-        elif request.POST.get('cancel_button') is not None:
+#stud_add
 
-            return HttpResponseRedirect(u'%s?status_message=Редагування студента скасовано!' % reverse('main'))
-        
+class StudentCreate(CreateView):
+  model = Student
+  template_name = 'students/students_add.html'
+  def get_success_url(self):
+    return u'%s?status_message=Студента успішно збережено!' % reverse('main')
+  def post(self, request, *args, **kwargs):
+    if request.POST.get('cancel_button'):
+      return HttpResponseRedirect(u'%s?status_message=Редагування студента відмінено!'% reverse('main'))
     else:
-        return render(request,
-                      'students/students_edit.html',
-                      {'pk': pk, 'student': students[0], 'groups': groups})
+      return super(StudentUpdate, self).post(request, *args, **kwargs)
+    
 
 
 
 
+#########################################################
+
+#stud_edit
+
+   #crispy
+class StudentUpdateForm(ModelForm):
+  class Meta:
+    model = Student
+  def __init__(self, *args, **kwargs):
+      super(StudentUpdateForm, self).__init__(*args, **kwargs)
+      self.helper = FormHelper(self)
+      # set form tag attributes
+      self.helper.form_action = reverse('students_edit',kwargs={'pk': kwargs['instance'].id})
+      self.helper.form_method = 'POST'
+      self.helper.form_class = 'form-horizontal'
+      # set form field properties
+      self.helper.help_text_inline = True
+      self.helper.html5_required = True
+      self.helper.label_class = 'col-sm-2 control-label'
+      self.helper.field_class = 'col-sm-10'
+      # add buttons
+      self.helper.layout[-1] = FormActions(
+        Submit('add_button', u'Зберегти', css_class="btn btn-primary"),
+        Submit('cancel_button', u'Скасувати', css_class="btn btn-link"),
+      )
 
 
+
+class StudentUpdate(UpdateView):
+  model = Student
+  template_name = 'students/students_edit.html'
+  form_class = StudentUpdateForm
+  def get_success_url(self):
+    return u'%s?status_message=Студента успішно збережено!' % reverse('main')
+  def post(self, request, *args, **kwargs):
+    if request.POST.get('cancel_button'):
+      return HttpResponseRedirect(u'%s?status_message=Редагування студента відмінено!'% reverse('main'))
+    else:
+      return super(StudentUpdate, self).post(request, *args, **kwargs)
+
+#studentupdate(crispy_form)
+
+
+##############################################################
+
+#stud_delete
 def student_delete(request, pk):
     students = Student.objects.filter(pk=pk)
     

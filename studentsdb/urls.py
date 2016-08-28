@@ -14,17 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from students.view.student import StudentList
+
+from students.view.contact_admin import ContactView
 from django.conf.urls import patterns, include,url
 from django.contrib import admin
 from .settings import MEDIA_ROOT, DEBUG
+from students.view.student import StudentUpdate, StudentCreate
 
 urlpatterns = patterns('',
 # Students urls
 url(r'^$', StudentList.as_view(), name='main'),
 url(r'^vid$', 'students.view.journal.vid', name='journal'),
-url(r'^stud_add$', 'students.view.student.stud_add', name='s_add'),
-url(r'^students/(?P<pk>\d+)/edit/$','students.view.student.student_edit',
-name='students_edit'),
+url(r'^stud_add$', StudentCreate.as_view(), name='s_add'),
+url(r'^students/(?P<pk>\d+)/edit/$',StudentUpdate.as_view(), name='students_edit'),
 url(r'^students/(?P<pk>\d+)/delete/$','students.view.student.student_delete',name='students_delete'),
 #Groups urls
 url(r'^grup$', 'students.view.groups.grup', name='groups'),
@@ -44,7 +46,7 @@ url(r'^exams/(?P<pk>\d+)/edit/$',
 url(r'^exams/(?P<pk>\d+)/delete/$',
 'students.view.exams.exam_delete', name='exam_delete'),
 # Contact Admin Form
-url(r'^contact-admin/$', 'students.view.contact_admin.contact_admin',
+url(r'^contact-admin/$', ContactView.as_view(),
 name='contact_admin'),
 )
 if DEBUG:
