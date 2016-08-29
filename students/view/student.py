@@ -13,6 +13,7 @@ from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.bootstrap import FormActions
+from crispy_forms.layout import Submit, Button
 
 
 
@@ -53,17 +54,53 @@ class StudentList(ListView):
 ##########################################################################
 
 #stud_add
+ 
+#crispy
+
+class StudentCreateForm(ModelForm):
+    class Meta:
+        model = Student
+        fields = ['first_name',
+                  'last_name',
+                  'middle_name',
+                  'birthday',
+                  'photo',
+                  'ticket',
+                  'student_group_id',
+                  'notes']
+
+    def __init__(self, *args, **kwargs):
+        super(StudentCreateForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+
+        # set form tag attributes
+        self.helper.form_action = reverse('s_add')
+        self.helper.form_method = 'POST'
+        self.helper.form_class = 'form-horizontal'
+
+        # set form field properties
+        self.helper.help_text_inline = True
+        self.helper.html5_required = True
+        self.helper.label_class = 'col-sm-2 control-label'
+        self.helper.field_class = 'col-sm-10'
+
+        # add buttons
+        self.helper.add_input(Submit('save_button', u'Надіслати'))
+        self.helper.add_input(
+            Button('cancel_button', u'Скасувати', onclick='window.location.href="{}"'.format(reverse('main'))))
+
 
 class StudentCreate(CreateView):
   model = Student
   template_name = 'students/students_add.html'
+  form_class = StudentCreateForm
   def get_success_url(self):
-    return u'%s?status_message=Студента успішно збережено!' % reverse('main')
+    return u'%s?status_message=Студента успішно створено!' % reverse('main')
   def post(self, request, *args, **kwargs):
     if request.POST.get('cancel_button'):
-      return HttpResponseRedirect(u'%s?status_message=Редагування студента відмінено!'% reverse('main'))
+      return HttpResponseRedirect(u'%s?status_message=Створення студента відмінено!'% reverse('main'))
     else:
-      return super(StudentUpdate, self).post(request, *args, **kwargs)
+      return super(StudentCreate, self).post(request, *args, **kwargs)
     
 
 
