@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from students.view.student import StudentList
+from students.view.group import GroupList, GroupCreate
 
 from students.view.contact_admin import ContactView
 from django.conf.urls import patterns, include,url
@@ -29,8 +30,8 @@ url(r'^stud_add$', StudentCreate.as_view(), name='s_add'),
 url(r'^students/(?P<pk>\d+)/edit/$',StudentUpdate.as_view(), name='students_edit'),
 url(r'^students/(?P<pk>\d+)/delete/$','students.view.student.student_delete',name='students_delete'),
 #Groups urls
-url(r'^grup$', 'students.view.groups.grup', name='groups'),
-url(r'^groups_add$', 'students.view.group.groups_add', name='groups_add'),
+url(r'^grup$', GroupList.as_view(), name='groups'),
+url(r'^groups_add$', GroupCreate.as_view(), name='groups_add'),
 url(r'^groups/(?P<pk>\d+)/edit/$',
 'students.view.group.groups_edit', name='groups_edit'),
 url(r'^groups/(?P<pk>\d+)/delete/$',

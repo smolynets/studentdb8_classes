@@ -60,34 +60,36 @@ class StudentList(ListView):
 class StudentCreateForm(ModelForm):
     class Meta:
         model = Student
-        fields = ['first_name',
-                  'last_name',
-                  'middle_name',
-                  'birthday',
-                  'photo',
-                  'ticket',
-                  'student_group_id',
-                  'notes']
+        fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
-        super(StudentCreateForm, self).__init__(*args, **kwargs)
+    def __init__(self,*args, **kwargs):
+        super(StudentCreateForm,self).__init__(*args, **kwargs)
+
         self.helper = FormHelper(self)
+
+            # return HttpResponseRedirect(
+            #     u'%s?status_message=5' %  reverse('main'))
+
 
         # set form tag attributes
         self.helper.form_action = reverse('s_add')
+        # self.helper.form_action = u'%s?status_message=5' % reverse('s_add')
+
         self.helper.form_method = 'POST'
-        self.helper.form_class = 'form-horizontal'
+        self.helper.form_class = 'col-sm-12 form-horizontal'
 
         # set form field properties
         self.helper.help_text_inline = True
         self.helper.html5_required = True
         self.helper.label_class = 'col-sm-2 control-label'
-        self.helper.field_class = 'col-sm-10'
+        self.helper.field_class = 'col-sm-8 input-group'
 
         # add buttons
-        self.helper.add_input(Submit('save_button', u'Надіслати'))
-        self.helper.add_input(
-            Button('cancel_button', u'Скасувати', onclick='window.location.href="{}"'.format(reverse('main'))))
+        # self.helper.layout.fields.append(self)
+        self.helper.layout.fields.append(FormActions(
+            Submit('add_button', (u'Зберегти'), css_class="btn btn-primary"),
+            Submit('cancel_button', (u'Скасувати'), css_class="btn btn-link"),
+)) 
 
 
 class StudentCreate(CreateView):
@@ -127,10 +129,10 @@ class StudentUpdateForm(ModelForm):
       self.helper.label_class = 'col-sm-2 control-label'
       self.helper.field_class = 'col-sm-10'
       # add buttons
-      self.helper.layout[-1] = FormActions(
+      self.helper.layout.fields.append(FormActions(
         Submit('add_button', u'Зберегти', css_class="btn btn-primary"),
         Submit('cancel_button', u'Скасувати', css_class="btn btn-link"),
-      )
+      ))
 
 
 
@@ -146,7 +148,7 @@ class StudentUpdate(UpdateView):
     else:
       return super(StudentUpdate, self).post(request, *args, **kwargs)
 
-#studentupdate(crispy_form)
+
 
 
 ##############################################################
