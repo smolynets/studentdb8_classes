@@ -13,13 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from students.view.student import StudentList
-from students.view.group import GroupList, GroupCreate
+from students.view.student import StudentList, StudentCreate, StudentUpdate, StudentDelete
+from students.view.group import GroupList, GroupCreate, GroupUpdate
 
 from students.view.contact_admin import ContactView
 from django.conf.urls import patterns, include,url
 from django.contrib import admin
-from .settings import MEDIA_ROOT, DEBUG
+from settings import MEDIA_ROOT, DEBUG
 from students.view.student import StudentUpdate, StudentCreate
 
 urlpatterns = patterns('',
@@ -28,16 +28,13 @@ url(r'^$', StudentList.as_view(), name='main'),
 url(r'^vid$', 'students.view.journal.vid', name='journal'),
 url(r'^stud_add$', StudentCreate.as_view(), name='s_add'),
 url(r'^students/(?P<pk>\d+)/edit/$',StudentUpdate.as_view(), name='students_edit'),
-url(r'^students/(?P<pk>\d+)/delete/$','students.view.student.student_delete',name='students_delete'),
+url(r'^students/(?P<pk>\d+)/delete/$',StudentDelete.as_view(), name='students_delete'),
 #Groups urls
 url(r'^grup$', GroupList.as_view(), name='groups'),
 url(r'^groups_add$', GroupCreate.as_view(), name='groups_add'),
-url(r'^groups/(?P<pk>\d+)/edit/$',
-'students.view.group.groups_edit', name='groups_edit'),
+url(r'^groups/(?P<pk>\d+)/edit/$',GroupUpdate.as_view(), name='groups_edit'),
 url(r'^groups/(?P<pk>\d+)/delete/$',
 'students.view.group.groups_delete', name='groups_delete'),
-url(r'^groups/(?P<pk>\d+)/one/$',
-'students.view.group.groups_one', name='groups_one'),
 url(r'^admin/', include(admin.site.urls)),
 #exams url
 url(r'^exams$', 'students.view.exams.exams_list', name='exams'),

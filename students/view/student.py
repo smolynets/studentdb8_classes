@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from django.contrib import messages
 from PIL import Image
-from django.views.generic import UpdateView, CreateView, ListView
+from django.views.generic import UpdateView, CreateView, ListView, DeleteView
 from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -154,20 +154,12 @@ class StudentUpdate(UpdateView):
 ##############################################################
 
 #stud_delete
-def student_delete(request, pk):
-    students = Student.objects.filter(pk=pk)
-    
-    if request.method == "POST":
-        if request.POST.get('yes') is not None:
-          students.delete()
-          return HttpResponseRedirect( u'%s?status_message=Студента успішно видалено!'  % reverse('main'))
-        elif request.POST.get('cancel_button') is not None:
-          return HttpResponseRedirect( u'%s?status_message=Видалення  студента  скасовано!'  % reverse('main'))
-        
-    else:
-        return render(request,
-                      'students/students_delete.html',
-                      {'pk': pk, 'student': students[0]})
+class StudentDelete(DeleteView):
+  model = Student
+  template_name = 'students/students_delete.html'
+  def get_success_url(self):
+    return u'%s?status_message=Студента успішно видалено!' % reverse('main')
+  
 
 
 
