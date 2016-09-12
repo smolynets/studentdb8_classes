@@ -159,7 +159,11 @@ class StudentDelete(DeleteView):
   template_name = 'students/students_delete.html'
   def get_success_url(self):
     return u'%s?status_message=Студента успішно видалено!' % reverse('main')
-  
+  def post(self, request, *args, **kwargs):
+    if request.POST.get('no_delete_button'):
+      return HttpResponseRedirect(u'%s?status_message=Видалення  студента відмінено!'% reverse('main'))
+    else:
+      return super(StudentDelete, self).post(request, *args, **kwargs)
 
 
 

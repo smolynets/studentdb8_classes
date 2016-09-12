@@ -14,13 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from students.view.student import StudentList, StudentCreate, StudentUpdate, StudentDelete
-from students.view.group import GroupList, GroupCreate, GroupUpdate
+from students.view.group import GroupList, GroupCreate, GroupUpdate, GroupDelete
+from students.view.exams import ExamList,ExamCreate, ExamUpdate, ExamDelete
 
 from students.view.contact_admin import ContactView
 from django.conf.urls import patterns, include,url
 from django.contrib import admin
 from settings import MEDIA_ROOT, DEBUG
-from students.view.student import StudentUpdate, StudentCreate
+
 
 urlpatterns = patterns('',
 # Students urls
@@ -33,16 +34,13 @@ url(r'^students/(?P<pk>\d+)/delete/$',StudentDelete.as_view(), name='students_de
 url(r'^grup$', GroupList.as_view(), name='groups'),
 url(r'^groups_add$', GroupCreate.as_view(), name='groups_add'),
 url(r'^groups/(?P<pk>\d+)/edit/$',GroupUpdate.as_view(), name='groups_edit'),
-url(r'^groups/(?P<pk>\d+)/delete/$',
-'students.view.group.groups_delete', name='groups_delete'),
+url(r'^groups/(?P<pk>\d+)/delete/$',GroupDelete.as_view(), name='groups_delete'),
 url(r'^admin/', include(admin.site.urls)),
 #exams url
-url(r'^exams$', 'students.view.exams.exams_list', name='exams'),
-url(r'^exam_add$', 'students.view.exams.exam_add', name='exam_add'),
-url(r'^exams/(?P<pk>\d+)/edit/$',
-'students.view.exams.exam_edit', name='exam_edit'),
-url(r'^exams/(?P<pk>\d+)/delete/$',
-'students.view.exams.exam_delete', name='exam_delete'),
+url(r'^exams$', ExamList.as_view(), name='exams'),
+url(r'^exam_add$',ExamCreate.as_view(), name='exam_add'),
+url(r'^exams/(?P<pk>\d+)/edit/$',ExamUpdate.as_view(), name='exam_edit'),
+url(r'^exams/(?P<pk>\d+)/delete/$',ExamDelete.as_view(), name='exam_delete'),
 # Contact Admin Form
 url(r'^contact-admin/$', ContactView.as_view(),
 name='contact_admin'),

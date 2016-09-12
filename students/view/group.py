@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from ..models.group import Group
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ..models.student import Student
-from django.views.generic import UpdateView, CreateView, ListView
+from django.views.generic import UpdateView, CreateView, ListView, DeleteView
 from django.forms import ModelForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -129,7 +129,7 @@ class GroupUpdate(UpdateView):
   template_name = 'students/groups_edit.html'
   form_class = GroupUpdateForm
   def get_success_url(self):
-    return u'%s?status_message=групу успішно відредаговано!' % reverse('groups')
+    return u'%s?status_message=Групу успішно відредаговано!' % reverse('groups')
   def post(self, request, *args, **kwargs):
     if request.POST.get('cancel_button'):
       return HttpResponseRedirect(u'%s?status_message=Редагування групи відмінено!'% reverse('groups'))
@@ -140,27 +140,19 @@ class GroupUpdate(UpdateView):
 
 ####################################################################################
 
-def groups_delete(request, pk):
-    groups = Group.objects.filter(pk=pk)
-    
-    if request.method == "POST":
-        if request.POST.get('yes') is not None:
-          try:
-            groups.delete()
-            return HttpResponseRedirect( u'%s?status_message=Групу  успішно  видалено!'  % reverse('groups'))
-          except:
-            return HttpResponseRedirect( u'%s?status_message=Видалення  неможливе,  оскілки  в  даній  групі  є  студенти. Будь - ласка, спочатку  видаліть  студентів!'  % reverse('groups'))
-        elif request.POST.get('cancel_button') is not None:
-          return HttpResponseRedirect( u'%s?status_message=Видалення  групи  скасовано!'  % reverse('groups'))
-        
+#group delete
+
+class GroupDelete(DeleteView):
+  model = Group
+  template_name = 'students/groups_delete.html'
+  def get_success_url(self):
+    return u'%s?status_message=Групу успішно видалено!' % reverse('groups')
+  def post(self, request, *args, **kwargs):
+    if request.POST.get('no_delete_button'):
+      return HttpResponseRedirect(u'%s?status_message=Видалення  групи відмінено!'% reverse('groups'))
     else:
-        return render(request,
-                      'students/groups_delete.html',
-                      {'pk': pk, 'group': groups[0]})
-
-
-
-
-
-
-
+      try:
+        return super(GroupDelete, self).post(request, *args, **kwargs)
+      except:
+        return HttpResponseRedirect( u'%s?status_message=Видалення  неможливе,  оскілки  в  даній  групі  є  студенти. Будь - ласка, спочатку  видаліть  студентів!'  % reverse('groups'))  
+    

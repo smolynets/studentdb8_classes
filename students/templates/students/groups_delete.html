@@ -1,28 +1,14 @@
 {% extends "students/base.html" %}
 {% load static from staticfiles %}
-{% block meta_title %}Студенти{% endblock meta_title %}
-{% block title %}Видалення  групи {{group.title}}{% endblock title %}
-{% block status_message %}
-{% if errors %}
-
-{% endif %}
-{% endblock status_message %}
+{% block meta_title %}Видалити групу{% endblock meta_title %}
+{% block title %}Видалити групу{% endblock title %}
 {% block content %}
-<p>Ви бажаєте  дійсно видалити {{group.title}}?</p>
-<p></p>
-<form action="{% url "groups_delete" pk %}" method="post"
-enctype="multipart/form-data" role="form" class="form-horizontal">
+<form action="" method="post">
 {% csrf_token %}
-
-<div class="form-group">
-<label class="col-sm-2 control-label"></label>
-<div class="col-sm-10">
-<input type="submit" value="Видалити" name="yes"
-class="btn btn-primary" />
-<button type="submit" name="cancel_button"
-class="btn btn-link">Скасувати</button>
-</div>
-</div>
+<p>Ви дійсно хочете видалити групу "{{ object }}"?</p>
+<input type="submit" value="Так" name="delete_button"
+class="btn btn-danger" />
+<input type="submit" value="Ні" name="no_delete_button"
+class="btn btn-danger" /><br /><br />
 </form>
-<p></p>
 {% endblock content %}
