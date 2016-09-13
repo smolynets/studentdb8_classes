@@ -16,7 +16,7 @@ class Exam(models.Model):
     null=True,)
 
   date = models.DateField(
-    blank=True,
+    blank=False,
     verbose_name=u"Дати")
   def __unicode__(self):
     return u"%s %s" % (self.title, self.group)

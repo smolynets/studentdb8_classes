@@ -45,10 +45,13 @@ class ContactView(FormView):
  form_class = ContactForm
  success_url = 'contact_admin'
  def form_valid(self, form):
-   """This method is called for valid data"""
-   subject = form.cleaned_data['subject']
-   message = form.cleaned_data['message']
-   from_email = form.cleaned_data['from_email']
-   send_mail(subject, message, from_email, ['admin@gmail.com'])
-   return super(ContactView, self).form_valid(form)
+   try:
+     """This method is called for valid data"""
+     subject = form.cleaned_data['subject']
+     message = form.cleaned_data['message']
+     from_email = form.cleaned_data['from_email']
+     send_mail(subject, message, from_email, ['admin@gmail.com'])
+     return super(ContactView, self).form_valid(form)
+   except:
+     return HttpResponseRedirect( u'%s?status_message= Сервіс тимчасово недоступний!'  % reverse('contact_admin')) 
 

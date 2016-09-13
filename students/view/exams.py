@@ -55,7 +55,7 @@ class ExamCreateForm(ModelForm):
         self.helper = FormHelper(self)
 
             # return HttpResponseRedirect(
-            #     u'%s?status_message=5' %  reverse('exams'))
+            #     u'%s?status_message=5' %  reverse('exam'))
 
 
         # set form tag attributes
@@ -90,7 +90,8 @@ class ExamCreate(CreateView):
       return HttpResponseRedirect(u'%s?status_message=Створення іспиту відмінено!'% reverse('exams'))
     else:
       return super(ExamCreate, self).post(request, *args, **kwargs)
-
+      
+         
 
 
 
@@ -150,6 +151,8 @@ class ExamDelete(DeleteView):
   def post(self, request, *args, **kwargs):
     if request.POST.get('no_delete_button'):
       return HttpResponseRedirect(u'%s?status_message=Видалення  іспиту відмінено!'% reverse('exams'))
+    else:
+      return super(ExamDelete, self).post(request, *args, **kwargs)
     
           
       
