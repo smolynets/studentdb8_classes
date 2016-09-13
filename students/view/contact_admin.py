@@ -43,7 +43,8 @@ class ContactForm(forms.Form):
 class ContactView(FormView):
  template_name = 'students/contact.html'
  form_class = ContactForm
- success_url = 'contact_admin'
+ def get_success_url(self):
+    return u'%s?status_message=Повідомлення успішно відправлено!' % reverse('contact_admin')
  def form_valid(self, form):
    try:
      """This method is called for valid data"""
